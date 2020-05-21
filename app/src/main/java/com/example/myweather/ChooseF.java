@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.myweather.db.City;
 import com.example.myweather.db.County;
 import com.example.myweather.db.Province;
@@ -23,7 +22,11 @@ import com.example.myweather.util.CountyR;
 import com.example.myweather.util.ProvinceR;
 import com.example.myweather.util.Util;
 
-import org.litepal.crud.DataSupport;
+
+import org.litepal.LitePal;
+import org.litepal.LitePalBase;
+import org.litepal.crud.LitePalSupport;
+import org.litepal.tablemanager.model.TableModel;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +53,6 @@ public class ChooseF extends Fragment {
     private  List<County> countyList;
     private  Province provinceselected;
     private   City citySelected;
-
     private  int currentLevel;
 
 
@@ -131,7 +133,7 @@ public class ChooseF extends Fragment {
 
         title.setText("中国");
         back.setVisibility(View.GONE);
-        provinceList= DataSupport.findAll(Province.class);
+        provinceList=LitePal.findAll(Province.class);
         if (provinceList.size()>0){
 
             datalist.clear();
@@ -178,8 +180,6 @@ public class ChooseF extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
-
                         closeDialog();
                         Toast.makeText(getContext(),"加载失败",Toast.LENGTH_LONG).show();
 
@@ -278,8 +278,18 @@ public class ChooseF extends Fragment {
             progressDialog=new ProgressDialog(getContext());
             progressDialog.setMessage("加载中。。。。。");
             progressDialog.setCanceledOnTouchOutside(false);
+         LitePalBase litePalBase=new LitePalBase() {
+             @Override
+             protected TableModel getTableModel(String className) {
+                 return super.getTableModel(className);
+             }
+         };
+
 
         }
+
+
+
         progressDialog.show();
 
 
@@ -289,7 +299,7 @@ public class ChooseF extends Fragment {
 
 title.setText(provinceselected.getProvincename());
 back.setVisibility(View.VISIBLE);
-cityList=DataSupport.where("provinceId = ?",String.valueOf(provinceselected.getId())).find(City.class);
+cityList=LitePal.where("provinceId = ?",String.valueOf(provinceselected.getId())).find(City.class);
 if (cityList.size()>0){
     datalist.clear();
     for (City city : cityList){
@@ -322,7 +332,7 @@ if (cityList.size()>0){
 
 title.setText(citySelected.getCityName());
 back.setVisibility(View.VISIBLE);
-countyList=DataSupport.where("cityId = ?",String.valueOf(citySelected.getId())).find(County.class);
+countyList=LitePal.where("cityId = ?",String.valueOf(citySelected.getId())).find(County.class);
 if (countyList.size()>0){
     datalist.clear();
     for (County county :countyList){
